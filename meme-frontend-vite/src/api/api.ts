@@ -1,10 +1,14 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'http://localhost:3001', // backend URL
+  baseURL: 'http://localhost:3001',
 });
 
-export const createMeme = (meme: { title: string; imageUrl: string }) =>
-  API.post('/memes', meme);
+export const createMeme = (formData: FormData) =>
+  API.post('/memes/upload', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
 
 export const getMemes = () => API.get('/memes');
