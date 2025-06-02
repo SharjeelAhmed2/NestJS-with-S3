@@ -38,4 +38,8 @@ export class MemesController {
   findAll() {
     return this.memesService.findAll();
   }
+  @Get('from-s3')
+  getAllS3Memes() {
+    return this.s3service.listAllMemes();
+  }
 }

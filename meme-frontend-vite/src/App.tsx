@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { createMeme, getMemes } from './api/api';
+import { createMeme, getS3Memes } from './api/api';
 
 function App() {
   const [memes, setMemes] = useState([]);
@@ -14,12 +14,21 @@ function App() {
     formData.append('file', file);
 
     await createMeme(formData);
-    const res = await getMemes();
+    const res = await getS3Memes();
     setMemes(res.data);
   };
 
   useEffect(() => {
-    getMemes().then((res) => setMemes(res.data));
+     const fetchMemes = async () => {
+      const res = await getS3Memes();
+      console.log("Got images from backend:", res.data);
+      setMemes(res.data.map((url: any) => ({
+        title: '', // or extract from filename to do 
+        imageUrl: url,
+      })));
+ //     console.log(memes);
+    };
+    fetchMemes();
   }, []);
 
   return (
@@ -52,16 +61,14 @@ function App() {
   <div className="max-w-4xl mx-auto px-4 mt-10">
     <h2 className="text-2xl font-bold mb-4 text-gray-800">Uploaded Memes</h2>
     <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
-      {memes.map((meme: any, index: number) => (
-        <div key={index} className="bg-white shadow-md rounded-lg overflow-hidden">
+      {memes.map((meme: any) => (
+        <div key={meme.imageUrl} className="w-64 h-64 bg-gray-100 p-2 m-2 rounded">
+         
           <img
             src={meme.imageUrl}
-            alt={meme.title}
-            className="w-full h-48 object-cover"
+            alt={"S3 Image"}
+            className="w-full h-auto object-contain mt-2"
           />
-          <div className="p-4">
-            <h3 className="text-lg font-semibold text-gray-700 text-center">{meme.title}</h3>
-          </div>
         </div>
       ))}
     </div>
