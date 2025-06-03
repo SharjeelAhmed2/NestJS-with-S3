@@ -30,7 +30,8 @@ export class MemesController {
     @Body('title') title: string,
   ) {
     //const imageUrl = `http://localhost:3001/uploads/${file.filename}`;
-      const imageUrl = await this.s3service.uploadFile(file);
+    console.log(file);
+    const imageUrl = await this.s3service.uploadFile(file, title);
     return this.memesService.create({ title, imageUrl });
   }
 

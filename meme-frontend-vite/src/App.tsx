@@ -17,23 +17,45 @@ function App() {
     const res = await getS3Memes();
     setMemes(res.data);
   };
+  const formatTitle = (raw: string) => {
+    return raw
+      .replace(/_/g, ' ')
+      .replace(/\.+$/, '') // removes trailing dots
+      .replace(/\b\w/g, (char) => char.toUpperCase()); // capitalize words
+  };
 
+  const extractTitle = (filename: string) => {
+    const match = filename.split('--')[1]?.split('.')[0];
+    return formatTitle(match || 'Untitled');
+  };
   useEffect(() => {
      const fetchMemes = async () => {
       const res = await getS3Memes();
       console.log("Got images from backend:", res.data);
-      setMemes(res.data.map((url: any) => ({
-        title: '', // or extract from filename to do 
+      //let titleOfImage = extractTitle(res.data)
+      // setMemes(res.data.map((url: any) => ({
+      //   title: titleOfImage,    
+      //   imageUrl: url,
+      // })));
+      
+    const mappedMemes = res.data.map((url: string) => {
+      const filename = url.split('/').pop() || '';
+      const title = extractTitle(filename);
+      return {
+        title,
         imageUrl: url,
-      })));
+      };
+    });
+
+    setMemes(mappedMemes);
+  };
  //     console.log(memes);
-    };
     fetchMemes();
   }, []);
 
   return (
 <div className="min-h-screen bg-gray-100 py-10">
-  <h1 className="text-3xl font-bold text-center mb-8">Meme Uploader</h1>
+  <h1 className="text-3xl font-bold text-center mb-8">Image Uploader</h1>
   <form
     onSubmit={handleSubmit}
     className="flex flex-col gap-4 items-start p-6 bg-white rounded-lg shadow-md max-w-md mx-auto"
@@ -54,21 +76,24 @@ function App() {
         type="submit"
         className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition-all"
       >
-        Upload Meme
+        Upload Image
       </button>
 </form>
  <div className="...">
   <div className="max-w-4xl mx-auto px-4 mt-10">
-    <h2 className="text-2xl font-bold mb-4 text-gray-800">Uploaded Memes</h2>
+    <h2 className="text-2xl font-bold mb-4 text-gray-800">Uploaded Images</h2>
     <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
-      {memes.map((meme: any) => (
-        <div key={meme.imageUrl} className="w-64 h-64 bg-gray-100 p-2 m-2 rounded">
+      {memes.map((meme: any, index: number) => (
+        <div key={index} className="w-64 h-64 bg-gray-100 p-2 m-2 rounded">
          
           <img
             src={meme.imageUrl}
             alt={"S3 Image"}
             className="w-full h-auto object-contain mt-2"
           />
+          <p>
+            {meme.title}
+          </p>
         </div>
       ))}
     </div>

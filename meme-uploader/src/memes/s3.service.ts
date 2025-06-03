@@ -17,15 +17,19 @@ export class S3Service {
     },
   });
 
-  async uploadFile(file: Multer.File): Promise<string> {
-    const fileExt = extname(file.originalname);
-    const key = `${uuidv4()}${fileExt}`;
+  async uploadFile(file: Multer.File, title: string): Promise<string> {
+    const fileExt = extname(title);
+    const safeTitle = title.replace(/\s+/g, '_'); // replace spaces
+    const key = `${uuidv4()}--${safeTitle}.$${fileExt}`;
 
     const uploadCommand = new PutObjectCommand({
       Bucket: process.env.AWS_BUCKET_NAME,
       Key: key,
       Body: file.buffer,
       ContentType: file.mimetype,
+    //    Metadata: {
+    //     title: title, // <-- this is what you wanted 😘
+    //  },
      // ACL: 'public-read', // So your image is accessible by URL
     });
 
