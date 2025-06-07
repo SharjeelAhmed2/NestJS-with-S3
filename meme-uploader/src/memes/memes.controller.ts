@@ -1,4 +1,4 @@
-import { Controller, Post, Get, UseInterceptors, UploadedFile, Body } from '@nestjs/common';
+import { Controller, Post, Get, UseInterceptors, UploadedFile, Body, Delete, Param } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { MemesService } from './memes.service';
@@ -43,4 +43,8 @@ export class MemesController {
   getAllS3Memes() {
     return this.s3service.listAllMemes();
   }
+  @Delete(':key')
+  delete(@Param('key') key: string) {
+  return this.s3service.deleteFile(key);
+}
 }

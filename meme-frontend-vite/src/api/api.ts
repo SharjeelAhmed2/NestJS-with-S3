@@ -13,3 +13,4 @@ export const createMeme = (formData: FormData) =>
 
 //export const getMemes = () => API.get('/memes');
 export const getS3Memes = () => API.get('/memes/from-s3');
+export const deleteMeme = (key: string) => API.delete(`/memes/${key}`) ;

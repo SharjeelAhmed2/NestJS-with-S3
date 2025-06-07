@@ -1,8 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { createMeme, getS3Memes } from './api/api';
-
+import { createMeme, getS3Memes, deleteMeme } from './api/api';
+import { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 function App() {
-  const [memes, setMemes] = useState([]);
+
+  type Meme = {
+  title: string;
+  imageUrl: string;
+};
+
+  const [memes, setMemes] = useState<Meme[]>([]);
+  //const [memes, setMemes] = useState([]);
   const [title, setTitle] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const handleSubmit = async (e: React.FormEvent) => {
@@ -53,7 +61,51 @@ function App() {
     fetchMemes();
   }, []);
 
+  // delete 
+  const getKeyFromUrl = (url: string) => {
+  return url.split('/').pop() || '';
+  };
+
+  // Undo Functionality 
+
+    const handleDelete = (imageUrl: string, title: string) => {
+    const key = getKeyFromUrl(imageUrl);
+  
+    const confirmDelete = window.confirm("Are you sure you want to delete this meme?");
+    if (!confirmDelete) return;
+  // 1. Remove from UI immediately
+  setMemes((prev: any[]) =>
+    prev.filter((m: any) => getKeyFromUrl(m.imageUrl) !== key)
+  );
+
+  // Step 2: schedule S3 deletion
+  const timeoutId = setTimeout(async () => {
+    await deleteMeme(key);
+    toast.success("Meme permanently deleted");
+  }, 5000);
+
+  // Step 3: show toast with Undo
+  toast((t) => (
+    <span>
+      <strong>{title}</strong> deleted
+      <button
+        className="ml-2 text-blue-500 underline"
+        onClick={() => {
+          clearTimeout(timeoutId);
+          setMemes((prev) => [...prev, { title, imageUrl }]); // bring back meme
+          toast.dismiss(t.id);
+        }}
+      >
+        Undo
+      </button>
+    </span>
+  ), {
+    duration: 5000,
+  });
+};
+
   return (
+      <>  <Toaster position="bottom-right" />
 <div className="min-h-screen bg-gray-100 py-10">
   <h1 className="text-3xl font-bold text-center mb-8">Image Uploader</h1>
   <form
@@ -83,7 +135,9 @@ function App() {
   <div className="max-w-4xl mx-auto px-4 mt-10">
     <h2 className="text-2xl font-bold mb-4 text-gray-800">Uploaded Images</h2>
     <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
-      {memes.map((meme: any, index: number) => (
+      {memes.map((meme: any, index: number) =>{const key = getKeyFromUrl(meme.imageUrl); 
+      
+      return (
         <div key={index} className="w-64 h-64 bg-gray-100 p-2 m-2 rounded">
          
           <img
@@ -94,13 +148,19 @@ function App() {
           <p>
             {meme.title}
           </p>
+         <button
+          onClick={() => handleDelete(meme.imageUrl, meme.title)}
+          className="mt-2 px-4 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600"
+        >
+          Delete
+        </button>
         </div>
-      ))}
+      )})}
     </div>
   </div>
 </div>
     </div>
-  );
+  </>);
 }
 
 export default App;
