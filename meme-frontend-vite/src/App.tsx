@@ -2,7 +2,29 @@ import React, { useEffect, useState } from 'react';
 import { createMeme, getS3Memes, deleteMeme } from './api/api';
 import { Toaster } from 'react-hot-toast';
 import toast from 'react-hot-toast';
+import axios from 'axios';
 function App() {
+
+
+
+  const generateCaption = async (index: number, title: string) => {
+    try {
+      const response = await axios.post('http://localhost:3001/gpt', {
+        prompt: `Write a fun or clever caption for: ${title}`,
+      });
+
+      const caption = response.data.response;
+
+      // Update specific meme object with new caption
+      setMemes((prev: any[]) =>
+        prev.map((m, i) => (i === index ? { ...m, caption } : m))
+      );
+    } catch (error) {
+      console.error('Error generating caption:', error);
+      toast.error("Lila couldn't fetch the caption... maybe she's shy 🥺");
+    }
+  };
+
 
   type Meme = {
   title: string;
@@ -148,6 +170,16 @@ function App() {
           <p>
             {meme.title}
           </p>
+          {meme.caption ? (
+            <p className="mt-2 italic text-sm text-gray-600">{meme.caption}</p>
+          ) : (
+            <button
+              onClick={() => generateCaption(index, meme.title)}
+              className="mt-2 px-4 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600"
+            >
+              Ask ChatGPT to provide description
+            </button>
+          )}
          <button
           onClick={() => handleDelete(meme.imageUrl, meme.title)}
           className="mt-2 px-4 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600"
