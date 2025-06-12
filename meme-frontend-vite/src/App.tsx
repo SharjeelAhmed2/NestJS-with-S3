@@ -160,14 +160,14 @@ function App() {
       {memes.map((meme: any, index: number) =>{const key = getKeyFromUrl(meme.imageUrl); 
       
       return (
-        <div key={index} className="w-64 h-64 bg-gray-100 p-2 m-2 rounded">
+        <div key={index} className="w-64 bg-gray-100 p-2 m-2 rounded flex flex-col justify-between min-h-[16rem]">
          
           <img
             src={meme.imageUrl}
             alt={"S3 Image"}
             className="w-full h-auto object-contain mt-2"
           />
-          <p>
+          <p className="break-words text-center font-semibold">
             {meme.title}
           </p>
           {meme.caption ? (
