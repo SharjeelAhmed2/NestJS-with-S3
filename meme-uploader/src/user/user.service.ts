@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { PrismaClient, Role as PrismaRole } from '@prisma/client';
+import { PrismaClient, Role as PrismaRole, User } from '@prisma/client';
 import { Role as DomainRole } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
 
@@ -25,5 +25,9 @@ export class UserService {
         role:     prismaRole,                // now TS is happy
       },
     });
+  }
+
+  async findByEmail(email: string) {
+    return this.prisma.user.findUnique({ where: { email } });
   }
 }

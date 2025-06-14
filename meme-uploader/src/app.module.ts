@@ -7,9 +7,11 @@ import { GptService } from './gpt/gpt.service';
 import { PrismaService } from './prisma/prisma.service';
 import { UserService } from './user/user.service';
 import { UserController } from './user/user.controller';
+import { AuthController } from './auth/auth.controller';
+import { AuthService } from './auth/auth.service';
 
 @Module({
-  controllers: [MemesController, GptController, UserController],
-  providers: [MemesService, S3Service, GptService, UserService, PrismaService,],
+  controllers: [MemesController, GptController, UserController, AuthController],
+  providers: [MemesService, S3Service, GptService, UserService, PrismaService, AuthService],
 })
 export class AppModule {}
