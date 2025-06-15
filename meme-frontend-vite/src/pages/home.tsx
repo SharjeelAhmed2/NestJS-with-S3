@@ -3,6 +3,8 @@ import { createMeme, getS3Memes, deleteMeme } from '../api/api';
 import { Toaster } from 'react-hot-toast';
 import toast from 'react-hot-toast';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
 export default function Home() {
   const generateCaption = async (index: number, title: string) => {
     try {
@@ -122,11 +124,20 @@ export default function Home() {
     duration: 5000,
   });
 };
-
+const navigate = useNavigate();
   return (
       <>  <Toaster position="bottom-right" />
-<div className="min-h-screen bg-gray-100 py-10">
-  <h1 className="text-3xl font-bold text-center mb-8">Image Uploader</h1>
+<div className="min-h-screen bg-gray-100 py-10  px-8">
+
+  <div className="flex justify-end mb-4">
+    <button
+      onClick={() => navigate('/login')}
+      className="px-4 py-1 bg-purple-600 text-white text-sm rounded hover:bg-black"
+    >
+      Logout
+    </button>
+  </div>
+    <h1 className="text-3xl font-bold text-center mb-8">Image Uploader</h1>
   <form
     onSubmit={handleSubmit}
     className="flex flex-col gap-4 items-start p-6 bg-white rounded-lg shadow-md max-w-md mx-auto"
