@@ -10,10 +10,14 @@ export default function Login() {
 
   const handleLogin = async () => {
     try {
-      await axios.post('http://localhost:3001/auth/login', {
+      const res = await axios.post('http://localhost:3001/auth/login', {
         email,
         password,
       });
+      console.log("Response", res)
+      const { access_token } = res.data;              // or whatever your API returns
+      localStorage.setItem('jwt', access_token);  
+      console.log('Stored JWT:', localStorage.getItem('jwt'));    // ← store it!
       navigate('/home');
     } catch (err) {
       console.error(err);
