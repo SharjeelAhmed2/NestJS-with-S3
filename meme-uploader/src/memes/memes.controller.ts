@@ -1,4 +1,4 @@
-import { Controller, Post, Get, UseInterceptors, UploadedFile, Body, Delete, Param } from '@nestjs/common';
+import { Controller, Post, Get, UseInterceptors, UploadedFile, Body, Delete, Param, UseGuards } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { MemesService } from './memes.service';
@@ -7,6 +7,10 @@ import { extname } from 'path';
 import { Multer } from 'multer';
 import * as dotenv from 'dotenv';
 import { S3Service } from './s3.service';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { AuthGuard } from '@nestjs/passport';
+import { Role } from '@prisma/client';
 dotenv.config();
 
 
@@ -34,11 +38,14 @@ export class MemesController {
     const imageUrl = await this.s3service.uploadFile(file, title);
     return this.memesService.create({ title, imageUrl });
   }
-
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.ADMIN)
   @Get()
   findAll() {
     return this.memesService.findAll();
   }
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.ADMIN)
   @Get('from-s3')
   getAllS3Memes() {
     return this.s3service.listAllMemes();
