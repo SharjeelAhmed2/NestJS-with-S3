@@ -17,11 +17,16 @@ export class S3Service {
     },
   });
 
-  async uploadFile(file: Multer.File, title: string): Promise<string> {
-    const fileExt = extname(title);
-    const safeTitle = title.replace(/\s+/g, '_'); // replace spaces
-    const key = `${uuidv4()}--${safeTitle}.$${fileExt}`;
+  async uploadFile(file: Multer.File, title: string, email: string): Promise<string> {
+    // const fileExt = extname(title);
+    // const safeTitle = title.replace(/\s+/g, '_'); // replace spaces
+    // const key = `${uuidv4()}--${safeTitle}.$${fileExt}`;
+    //const key = `${email}--${uuidv4()}--${safeTitle}${fileExt}`;
 
+    const fileExt = extname(file.originalname); // ← from the actual file
+    const safeTitle = title.replace(/\s+/g, '_'); // makes it filename-safe
+    console.log(safeTitle);
+    const key = `${email}--${uuidv4()}--${safeTitle}${fileExt}`;
     const uploadCommand = new PutObjectCommand({
       Bucket: process.env.AWS_BUCKET_NAME,
       Key: key,
@@ -59,4 +64,17 @@ export class S3Service {
 
     return await this.s3.send(command);
   }
+  async listMemesByUser(email: string): Promise<string[]> {
+  const command = new ListObjectsV2Command({
+    Bucket: process.env.AWS_BUCKET_NAME,
+  });
+
+  const response = await this.s3.send(command);
+
+  const imageUrls = response.Contents?.map((obj) => {
+    return `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${obj.Key}`;
+  }) || [];
+
+  return imageUrls.filter(url => url.includes(`${email}--`));
+}
 }

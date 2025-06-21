@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-export default function Home() {
+export default function Gallery() {
   const generateCaption = async (index: number, title: string) => {
     try {
       const response = await axios.post('http://localhost:3001/gpt', {
@@ -32,20 +32,7 @@ export default function Home() {
 
   const [memes, setMemes] = useState<Meme[]>([]);
   //const [memes, setMemes] = useState([]);
-  const [title, setTitle] = useState('');
-  const [file, setFile] = useState<File | null>(null);
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!file || !title) return;
 
-    const formData = new FormData();
-    formData.append('title', title);
-    formData.append('file', file);
-
-    await createMeme(formData);
-    const res = await getUserMemes();
-    setMemes(res.data);
-  };
   const formatTitle = (raw: string) => {
     return raw
       .replace(/_/g, ' ')
@@ -59,7 +46,7 @@ export default function Home() {
   };
   useEffect(() => {
      const fetchMemes = async () => {
-      const res = await getUserMemes();
+      const res = await getS3Memes();
       console.log("Got images from backend:", res.data);
       //let titleOfImage = extractTitle(res.data)
       // setMemes(res.data.map((url: any) => ({
@@ -129,46 +116,16 @@ const navigate = useNavigate();
       <>  <Toaster position="bottom-right" />
 <div className="min-h-screen bg-gray-100 py-10  px-8">
 
-  <div className="flex justify-end">
+  <div className="flex justify-end mb-4">
     <button
-      onClick={() => navigate('/login')}
-      className="px-10 py-1 bg-purple-600 text-white text-sm rounded hover:bg-black"
+      onClick={() => navigate('/home')}
+      className="px-4 py-1 bg-purple-600 text-white text-sm rounded hover:bg-black"
     >
-      Logout
+      Upload Images
     </button>
   </div>
-    <div className="flex justify-start">
-    <button
-      onClick={() => navigate('/gallery')}
-      className="px-10 py-1 bg-purple-600 text-white text-sm rounded hover:bg-black"
-    >
-      Gallery
-    </button>
-  </div>
-    <h1 className="text-3xl font-bold text-center mb-8">Image Uploader</h1>
-  <form
-    onSubmit={handleSubmit}
-    className="flex flex-col gap-4 items-start p-6 bg-white rounded-lg shadow-md max-w-md mx-auto"
-  >
-      <input
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder="Meme Title"
-        className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
-      />
-      <input
-        type="file"
-        accept="image/*"
-        onChange={(e) => setFile(e.target.files?.[0] || null)}
-        className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
-      />
-      <button
-        type="submit"
-        className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition-all"
-      >
-        Upload Image
-      </button>
-</form>
+    <h1 className="text-3xl font-bold text-center mb-8">Admin Gallery</h1>
+
  <div className="...">
   <div className="max-w-4xl mx-auto px-4 mt-10">
     <h2 className="text-2xl font-bold mb-4 text-gray-800">Uploaded Images</h2>

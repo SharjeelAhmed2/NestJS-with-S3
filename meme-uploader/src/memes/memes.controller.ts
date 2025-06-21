@@ -1,4 +1,4 @@
-import { Controller, Post, Get, UseInterceptors, UploadedFile, Body, Delete, Param, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, UseInterceptors, UploadedFile, Body, Delete, Param, UseGuards, Request } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { MemesService } from './memes.service';
@@ -29,13 +29,19 @@ export class MemesController {
       },
     }),
   }))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Post('upload')
+  @Roles(Role.USER, Role.ADMIN)
+  @UseInterceptors(FileInterceptor('file'))
  async uploadMeme(
     @UploadedFile() file: Multer.File,
     @Body('title') title: string,
+    @Request() req
   ) {
     //const imageUrl = `http://localhost:3001/uploads/${file.filename}`;
     console.log(file);
-    const imageUrl = await this.s3service.uploadFile(file, title);
+    const email = req.user.email; // thanks to JWT payload
+    const imageUrl = await this.s3service.uploadFile(file, title,email);
     return this.memesService.create({ title, imageUrl });
   }
   @UseGuards(AuthGuard('jwt'), RolesGuard)
@@ -53,5 +59,12 @@ export class MemesController {
   @Delete(':key')
   delete(@Param('key') key: string) {
   return this.s3service.deleteFile(key);
+}
+@UseGuards(AuthGuard('jwt'), RolesGuard)
+@Roles(Role.USER, Role.ADMIN)
+@Get('my-memes')
+async getUserMemes(@Request() req) {
+  const email = req.user.email;
+  return this.s3service.listMemesByUser(email);
 }
 }
