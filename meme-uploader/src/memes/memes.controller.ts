@@ -30,9 +30,7 @@ export class MemesController {
     }),
   }))
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Post('upload')
   @Roles(Role.USER, Role.ADMIN)
-  @UseInterceptors(FileInterceptor('file'))
  async uploadMeme(
     @UploadedFile() file: Multer.File,
     @Body('title') title: string,
