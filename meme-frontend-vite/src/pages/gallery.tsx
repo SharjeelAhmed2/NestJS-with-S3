@@ -20,7 +20,7 @@ export default function Gallery() {
       );
     } catch (error) {
       console.error('Error generating caption:', error);
-      toast.error("Lila couldn't fetch the caption... maybe she's shy 🥺");
+      toast.error("Couldn't fetch the message");
     }
   };
 
