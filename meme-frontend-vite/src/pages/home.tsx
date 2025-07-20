@@ -127,22 +127,20 @@ export default function Home() {
 const navigate = useNavigate();
   return (
       <>  <Toaster position="bottom-right" />
-<div className="min-h-screen bg-gray-100 py-10  px-8">
-
-  <div className="flex justify-end">
-    <button
-      onClick={() => navigate('/login')}
-      className="px-10 py-1 bg-purple-600 text-white text-sm rounded hover:bg-black"
-    >
-      Logout
-    </button>
-  </div>
-    <div className="flex justify-start">
+<div className="min-h-screen bg-gray-100 py-10 px-8">
+  <div className="flex justify-between items-center mb-8">
     <button
       onClick={() => navigate('/gallery')}
       className="px-10 py-1 bg-purple-600 text-white text-sm rounded hover:bg-black"
     >
       Gallery
+    </button>
+
+    <button
+      onClick={() => navigate('/login')}
+      className="px-10 py-1 bg-purple-600 text-white text-sm rounded hover:bg-black"
+    >
+      Logout
     </button>
   </div>
     <h1 className="text-3xl font-bold text-center mb-8">Image Uploader</h1>
