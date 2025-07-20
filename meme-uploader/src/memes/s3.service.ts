@@ -32,10 +32,6 @@ export class S3Service {
       Key: key,
       Body: file.buffer,
       ContentType: file.mimetype,
-    //    Metadata: {
-    //     title: title, // <-- this is what you wanted 😘
-    //  },
-     // ACL: 'public-read', // So your image is accessible by URL
     });
 
     await this.s3.send(uploadCommand);
